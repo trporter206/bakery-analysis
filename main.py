@@ -21,8 +21,13 @@ def overview(data):
 
 # overview(bakery_data)
 
+#remove missing values----------------------------------------------------------
+bakery_data = bakery_data[bakery_data.Item != "NONE"]
+
 #combine each transaction to a single row, items become list--------------------
 foo = lambda a: ", ".join(a)
 bakery_data['Item'].astype('category')
 aggregate = {'Date': 'first', 'Time': 'first', 'Item': foo}
 bakery_data = bakery_data.groupby(bakery_data['Transaction']).aggregate(aggregate)
+
+print bakery_data.head(200)
