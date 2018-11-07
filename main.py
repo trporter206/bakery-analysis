@@ -21,13 +21,30 @@ def overview(data):
 
 # overview(bakery_data)
 
-#remove missing values----------------------------------------------------------
+#remove missing values and get basic data---------------------------------------
 bakery_data = bakery_data[bakery_data.Item != "NONE"]
 
+unique_items = bakery_data['Item'].unique()
+popular_items = bakery_data.Item.value_counts()[:10]
+other_items = bakery_data.Item.count() - popular_items.sum()
+
+top_items = popular_items.append(pd.Series([other_items], index=['Others']))
+
+print top_items
+
 #combine each transaction to a single row, items become list--------------------
-foo = lambda a: ", ".join(a)
+foo = lambda a: ", ".join(a).split(', ')
 bakery_data['Item'].astype('category')
-aggregate = {'Date': 'first', 'Time': 'first', 'Item': foo}
+aggregate = {'Transaction': 'first', 'Date': 'first', 'Time': 'first', 'Item': foo}
 bakery_data = bakery_data.groupby(bakery_data['Transaction']).aggregate(aggregate)
 
-print bakery_data.head(200)
+
+#add features-------------------------------------------------------------------
+for dataset in [bakery_data]:
+    dataset['Count'] = dataset['Item'].str.len()
+
+#explore data-------------------------------------------------------------------
+p = bakery_data[['Date', 'Count']].groupby('Date').sum()
+p['2016-10-31': '2016-11-28'].plot()
+
+# plt.show()
