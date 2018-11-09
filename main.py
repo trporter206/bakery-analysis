@@ -56,21 +56,38 @@ for dataset in [coffee_df]:
     dataset['ratio_w_coffee'] = dataset['with_coffee'] / dataset['without_coffee']
     dataset['perc_of_coffee'] = (dataset['with_coffee'] / 5471)*100
 
-print coffee_df
+#coffee predictions-------------------------------------------------------------
+bakery_copy = bakery_copy[bakery_copy['Item'] == 'Coffee'].drop(['Transaction'], axis=1)
 
-#combine each transaction to a single row, items become list--------------------
-foo = lambda a: ", ".join(a).split(', ')
-bakery_data['Item'].astype('category')
-aggregate = {'Transaction': 'first', 'Date': 'first', 'Time': 'first', 'Item': foo}
-bakery_data = bakery_data.groupby(bakery_data['Transaction']).aggregate(aggregate)
+daily_coffee_df = bakery_copy.groupby(['Date']).size().reset_index(name='Coffee')
+
+data_len=len(daily_coffee_df.Coffee)
+test = daily_coffee_df.Coffee.loc[data_len*.8:] #31
+train = daily_coffee_df.Coffee.loc[:data_len*.8] #127
+
+print train.describe()
 
 
-#add features-------------------------------------------------------------------
-for dataset in [bakery_data]:
-    dataset['Count'] = dataset['Item'].str.len()
 
-#explorations-------------------------------------------------------------------
-p = bakery_data[['Date', 'Count']].groupby('Date').sum()
-p['2016-10-31': '2016-11-28'].plot()
+
+
+
+
+
+
+# #combine each transaction to a single row, items become list--------------------
+# foo = lambda a: ", ".join(a).split(', ')
+# bakery_data['Item'].astype('category')
+# aggregate = {'Transaction': 'first', 'Date': 'first', 'Time': 'first', 'Item': foo}
+# bakery_data = bakery_data.groupby(bakery_data['Transaction']).aggregate(aggregate)
+#
+#
+# #add features-------------------------------------------------------------------
+# for dataset in [bakery_data]:
+#     dataset['Count'] = dataset['Item'].str.len()
+#
+# #explorations-------------------------------------------------------------------
+# p = bakery_data[['Date', 'Count']].groupby('Date').sum()
+# p['2016-10-31': '2016-11-28'].plot()
 
 # plt.show()
