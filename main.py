@@ -23,31 +23,40 @@ def overview(data):
 
 #remove missing values and get basic data---------------------------------------
 bakery_data = bakery_data[bakery_data.Item != "NONE"]
-
 unique_items = bakery_data['Item'].unique()
 popular_items = bakery_data.Item.value_counts()[:10]
 other_items = bakery_data.Item.count() - popular_items.sum()
 top_items = popular_items.append(pd.Series([other_items], index=['Others']))
-
+values = top_items.tolist()
+labels = popular_items.index.values.tolist()
 orders_w_coffee = bakery_data[bakery_data['Item'] == 'Coffee']['Transaction'].tolist()
 
-#df with only coffee orders
+#df with only orders including coffee
 bakery_copy = bakery_data
 bakery_copy = bakery_copy[bakery_copy['Transaction'].isin(orders_w_coffee)]
 
 pop_items_w_coffee = bakery_copy.Item.value_counts()[:10]
+popular_items = bakery_data.Item.value_counts()[:10]
+
 pop_items_w_coffee = pop_items_w_coffee.drop(labels=['Coffee'])
 popular_items = popular_items.drop(labels=['Coffee'])
+
 #item names
 labels = pop_items_w_coffee.index.values.tolist()
+
 vals_coffee = pop_items_w_coffee.tolist()
 vals = popular_items.tolist()
 vals_wo_coffee = [vals[i] - v for i,v in enumerate(vals_coffee)]
 
 #df showing how often items are/not ordered with coffee
-new_df = pd.DataFrame({'with_coffee': vals_coffee, 'without_coffee': vals_wo_coffee})
+coffee_df = pd.DataFrame({'Item': pd.Series(labels), 'with_coffee': vals_coffee, 'without_coffee': vals_wo_coffee})
 
-vals_list = new_df.values.tolist()
+#add features
+for dataset in [coffee_df]:
+    dataset['ratio_w_coffee'] = dataset['with_coffee'] / dataset['without_coffee']
+    dataset['perc_of_coffee'] = (dataset['with_coffee'] / 5471)*100
+
+print coffee_df
 
 #combine each transaction to a single row, items become list--------------------
 foo = lambda a: ", ".join(a).split(', ')
