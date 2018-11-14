@@ -23,6 +23,7 @@ def overview(data):
 
 #remove missing values and get basic data---------------------------------------
 bakery_data = bakery_data[bakery_data.Item != "NONE"]
+
 unique_items = bakery_data['Item'].unique()
 popular_items = bakery_data.Item.value_counts()[:10]
 other_items = bakery_data.Item.count() - popular_items.sum()
@@ -40,7 +41,7 @@ popular_items = bakery_data.Item.value_counts()[:10]
 
 pop_items_w_coffee = pop_items_w_coffee.drop(labels=['Coffee'])
 popular_items = popular_items.drop(labels=['Coffee'])
-
+print pop_items_w_coffee
 #item names
 labels = pop_items_w_coffee.index.values.tolist()
 
@@ -55,26 +56,7 @@ coffee_df = pd.DataFrame({'Item': pd.Series(labels), 'with_coffee': vals_coffee,
 for dataset in [coffee_df]:
     dataset['ratio_w_coffee'] = dataset['with_coffee'] / dataset['without_coffee']
     dataset['perc_of_coffee'] = (dataset['with_coffee'] / 5471)*100
-
-#coffee predictions-------------------------------------------------------------
-bakery_copy = bakery_copy[bakery_copy['Item'] == 'Coffee'].drop(['Transaction'], axis=1)
-
-daily_coffee_df = bakery_copy.groupby(['Date']).size().reset_index(name='Coffee')
-
-data_len=len(daily_coffee_df.Coffee)
-test = daily_coffee_df.Coffee.loc[data_len*.8:] #31
-train = daily_coffee_df.Coffee.loc[:data_len*.8] #127
-
-print train.describe()
-
-
-
-
-
-
-
-
-
+print coffee_df
 # #combine each transaction to a single row, items become list--------------------
 # foo = lambda a: ", ".join(a).split(', ')
 # bakery_data['Item'].astype('category')
